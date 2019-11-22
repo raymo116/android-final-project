@@ -8,6 +8,8 @@ import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.media.VolumeShaper
+import android.os.Handler
 import android.provider.MediaStore
 import android.widget.ImageView
 
@@ -28,6 +30,8 @@ class MainActivity : AppCompatActivity() {
     val keyShiftUp = 480F
     val keyShiftRight = 127F
     val initialBlackOffset = 81F
+
+    val duration = 100L
 
     // ToDO: Have the different key sounds
     // ToDO: Fix the note cutoff
@@ -148,6 +152,9 @@ class MainActivity : AppCompatActivity() {
     // Add audio to a single key
     fun addAudioToKey(key: ImageView, sound: Int) {
 
+        val times = floatArrayOf(0f, 1f) // can add more points, volume points must correspond to time points
+        val volumes = floatArrayOf(1f, 0f)
+
         // Create a media player
         var keySound = MediaPlayer.create(this, sound) // Add audio here
 
@@ -159,21 +166,26 @@ class MainActivity : AppCompatActivity() {
 
                 // Start the audio
                 keySound.start()
+                //println("Test1: " + volumeOut.volume)
 
                 // make the key darker
                 key.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP)
 
             // If it's released
             } else if (event.action == MotionEvent.ACTION_UP) {
-
                 // Clear the color
                 key.clearColorFilter()
 
-                // Stop the media player
+                for(i in 1..10) {
+                    keySound.setVolume((1/(i*i)).toFloat(),(1/(i*i)).toFloat())
+                    Thread.sleep(2)
+                }
+
                 keySound.stop()
 
                 // Reset the player
                 keySound.prepare()
+                keySound.setVolume((1).toFloat(),(1).toFloat())
 
             }
 
