@@ -1,5 +1,6 @@
 package com.example.ivories
 
+import android.annotation.SuppressLint
 import android.content.ComponentCallbacks2
 import android.content.Context
 import android.media.MediaPlayer
@@ -23,29 +24,27 @@ import java.lang.Exception
 // ToDo: Fix the bottom note being too low
 // ToDo: fix the organ audio being too low
 // ToDo: Fix the organ clipping when looping
+// ToDo: Fix A#4 in Organ Mode
+// ToDo: Fix C5 in Piano Mode
 
 class MainActivity : AppCompatActivity() {
     // lists that hold all of the keys
-    var whiteKeys = ArrayList<pianoKey>()
-    var blackKeys = ArrayList<pianoKey>()
+    private var whiteKeys = ArrayList<pianoKey>()
+    private var blackKeys = ArrayList<pianoKey>()
 
     // Audio for the keys
     // ToDo: Still have to remake C3
-    var whitePianoNotes = ArrayList<Int>()
-    var whiteOrganNotes = ArrayList<Int>()
-    var blackPianoNotes = ArrayList<Int>()
-    var blackOrganNotes = ArrayList<Int>()
+    private var whitePianoNotes = ArrayList<Int>()
+    private var whiteOrganNotes = ArrayList<Int>()
+    private var blackPianoNotes = ArrayList<Int>()
+    private var blackOrganNotes = ArrayList<Int>()
 
     // Constants used throughout
-    val screenHeight = 1080F
-    val screenWidth = 1920F
-    val keyShiftUp = 480F
-    val keyShiftRight = 127F
-    val initialBlackOffset = 81F
+    private val screenHeight = 1080F
+    private val keyShiftRight = 127F
+    private val initialBlackOffset = 81F
 
-    val duration = 100L
-
-    var pianoSelected = true
+    private var pianoSelected = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,59 +62,8 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    // ToDo: Refactor these when you get the change
-    fun createWhiteKey( _x: Float, _y: Float, i: Int): ImageView {
-
-        // Creates a new image
-        var newView = ImageView(this)
-
-        // Add to the layout
-        myLayout.addView(newView)
-
-        // Set the skin
-        newView.setImageResource(R.drawable.whitekey)
-
-        // Set the x and y coordinates
-        newView.x = _x
-        newView.y = _y - keyShiftUp
-
-        // Set the background color
-        newView.setBackgroundColor(Color.TRANSPARENT)
-
-        // Assign audio to the key
-//        addAudioToKey(newView, whitePianoNotes[i], whiteOrganNotes[i])
-
-        // return the object
-        return newView
-    }
-
-    fun createBlackKey( _x: Float, _y: Float, pianoSound: Int, organSound: Int): ImageView {
-
-        // Creates a new image
-        var newView = ImageView(this)
-
-        // Add to the layout
-        myLayout.addView(newView)
-
-        // Set the skin
-        newView.setImageResource(R.drawable.blackkey)
-
-        // Set the x and y coordinates
-        newView.x = _x + initialBlackOffset
-        newView.y = _y - keyShiftUp
-
-        // Set the background color
-        newView.setBackgroundColor(Color.TRANSPARENT)
-
-        // Assign audio to the key
-//        addAudioToKey(newView, pianoSound, organSound)
-
-        // return the object
-        return newView
-    }
-
     // Create all of the white keys
-    fun createWhiteKeys() {
+    private fun createWhiteKeys() {
         // creates 14 white keys
         for (i in 0..14) {
             //whiteKeys.add(createWhiteKey(0F+(keyShiftRight*i), screenHeight, i))
@@ -124,7 +72,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Creates all of the black keys
-    fun createBlackKeys() {
+    private fun createBlackKeys() {
         // Create black keys
         var i = 0
         var sound = 0
@@ -152,60 +100,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Sets the screen to full so that you don't have to worry about the navigation bar
-    fun setToFullScreen() {
+    private fun setToFullScreen() {
         window.decorView.apply {
             systemUiVisibility = View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
         }
     }
 
-    // Add audio to a single key
-    fun addAudioToKey(key: ImageView, ps: Int) {
-
-        val times = floatArrayOf(0f, 1f) // can add more points, volume points must correspond to time points
-        val volumes = floatArrayOf(1f, 0f)
-
-        // Create a media player
-        var pianoSound = MediaPlayer.create(this, ps) // Add audio here
-
-            // Piano Sound
-            key.setOnTouchListener(View.OnTouchListener { v, event ->
-
-                // If it's being pressed
-                if (pianoSelected && event.action == MotionEvent.ACTION_DOWN) {
-
-                    // Start the audio
-                    pianoSound.start()
-                    //println("Test1: " + volumeOut.volume)
-
-                    // make the key darker
-                    key.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP)
-
-                    // If it's released
-                } else if (pianoSelected && event.action == MotionEvent.ACTION_UP) {
-                    // Clear the color
-                    key.clearColorFilter()
-
-                    for(i in 1..10) {
-                        pianoSound.setVolume((1/(i*i)).toFloat(),(1/(i*i)).toFloat())
-                        Thread.sleep(2)
-                    }
-
-                    pianoSound.stop()
-
-                    // Reset the player
-                    pianoSound.prepare()
-                    pianoSound.setVolume((1).toFloat(),(1).toFloat())
-
-                }
-
-                true
-            })
-
-
-    }
-
     // Loads the white notes
-    fun loadWhiteNotes() {
+    private fun loadWhiteNotes() {
         whitePianoNotes = intArrayOf(
 
             // ToDo: add back c3
@@ -224,7 +126,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Loads the black notes
-    fun loadBlackNotes() {
+    private fun loadBlackNotes() {
         blackPianoNotes = intArrayOf(
 
             R.raw.piano_cs3, R.raw.piano_ds3, R.raw.piano_fs3, R.raw.piano_gs3, R.raw.piano_as3,
@@ -239,7 +141,7 @@ class MainActivity : AppCompatActivity() {
         ).toCollection(ArrayList())
     }
 
-    fun loadBackground() {
+    private fun loadBackground() {
         val background = ImageView(this.applicationContext)
         background.setImageResource(R.drawable.speakerbar)
         background.x = 0f
@@ -247,7 +149,7 @@ class MainActivity : AppCompatActivity() {
         myLayout.addView(background)
     }
 
-    fun openMenu(c: ImageView, m: ImageView, e: ImageView, o: ImageView, p: ImageView) {
+    private fun openMenu(c: ImageView, m: ImageView, e: ImageView, o: ImageView, p: ImageView) {
         c.visibility = View.GONE
         m.visibility = View.VISIBLE
         e.visibility = View.VISIBLE
@@ -255,7 +157,7 @@ class MainActivity : AppCompatActivity() {
         p.visibility = View.VISIBLE
     }
 
-    fun closeMenu(c: ImageView, m: ImageView, e: ImageView, o: ImageView, p: ImageView) {
+    private fun closeMenu(c: ImageView, m: ImageView, e: ImageView, o: ImageView, p: ImageView) {
         m.visibility = View.GONE
         e.visibility = View.GONE
         o.visibility = View.GONE
@@ -266,7 +168,8 @@ class MainActivity : AppCompatActivity() {
     // Don't fuck with this code. It took waaay too long to make work
     // I'll go back and clean it up later
     // - Matt
-    fun createMenu() {
+    @SuppressLint("ClickableViewAccessibility")
+    private fun createMenu() {
 
         // Create Options icon
         // Creates a new image
@@ -298,7 +201,6 @@ class MainActivity : AppCompatActivity() {
         menu.visibility = View.GONE
 
         // Creates Exit Button
-
         val exitButton = ImageView(this.applicationContext)
         exitButton.setImageResource(R.drawable.exitbutton)
         exitButton.x = 415f
@@ -334,7 +236,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        cog.setOnTouchListener(View.OnTouchListener { v, event ->
+        cog.setOnTouchListener { _, event ->
 
             // If it's being pressed
             if (event.action == MotionEvent.ACTION_DOWN) {
@@ -360,9 +262,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             true
-        })
+        }
 
-        exitButton.setOnTouchListener(View.OnTouchListener { v, event ->
+        exitButton.setOnTouchListener { _, event ->
 
             // If it's being pressed
             if (event.action == MotionEvent.ACTION_DOWN) {
@@ -387,9 +289,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             true
-        })
+        }
 
-        pianoButton.setOnTouchListener(View.OnTouchListener { v, event ->
+        pianoButton.setOnTouchListener { _, event ->
 
             // If it's being pressed
             if (event.action == MotionEvent.ACTION_DOWN) {
@@ -417,9 +319,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             true
-        })
+        }
 
-        organButton.setOnTouchListener(View.OnTouchListener { v, event ->
+        organButton.setOnTouchListener { _, event ->
 
             // If it's being pressed
             if (event.action == MotionEvent.ACTION_DOWN) {
@@ -444,36 +346,35 @@ class MainActivity : AppCompatActivity() {
             }
 
             true
-        })
+        }
     }
 
-    fun convertToPianoSounds() {
+    private fun convertToPianoSounds() {
         pianoSelected = true
-        for(i in 0..(whiteKeys.count()-1)) {
+        for(i in 0 until(whiteKeys.count()-1)) {
             whiteKeys[i].changeSound(whitePianoNotes[i], pianoSelected)
         }
 
-        for(i in 0..(blackKeys.count()-1)) {
+        for(i in 0 until (blackKeys.count()-1)) {
             blackKeys[i].changeSound(blackPianoNotes[i], pianoSelected)
         }
     }
 
-    fun convertToOrganSounds() {
+    private fun convertToOrganSounds() {
         pianoSelected = false
-        for(i in 0..(whiteKeys.count()-1)) {
+        for(i in 0 until whiteKeys.count()) {
             whiteKeys[i].changeSound(whiteOrganNotes[i], pianoSelected)
         }
 
-        for(i in 0..(blackKeys.count()-1)) {
+        for(i in 0 until (blackKeys.count()-1)) {
             blackKeys[i].changeSound(blackOrganNotes[i], pianoSelected)
         }
     }
 
-    class pianoKey(context: Context, myLayout: ConstraintLayout, _x: Float, _y: Float, sound: Int, image: Int) {
+    private class pianoKey(context: Context, myLayout: ConstraintLayout, _x: Float, _y: Float, sound: Int, image: Int) {
         var keySound = MediaPlayer()
         var newView = ImageView(context)
         var parentContext = context
-        val initialBlackOffset = 81F
         val keyShiftUp = 480F
 
 
@@ -497,7 +398,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Add audio to a single key
-        fun addAudioToKey(sound: Int, pianoSelected: Boolean = true) {
+        @SuppressLint("ClickableViewAccessibility")
+        private fun addAudioToKey(sound: Int, pianoSelected: Boolean = true) {
 
             val times = floatArrayOf(0f, 1f) // can add more points, volume points must correspond to time points
             val volumes = floatArrayOf(1f, 0f)
@@ -511,7 +413,7 @@ class MainActivity : AppCompatActivity() {
             keySound = MediaPlayer.create(parentContext, sound)
 
             // Create an on-touch listener
-            newView.setOnTouchListener(View.OnTouchListener { v, event ->
+            newView.setOnTouchListener { _, event ->
 
                 // If it's being pressed
                 if (event.action == MotionEvent.ACTION_DOWN) {
@@ -542,7 +444,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 true
-            })
+            }
         }
 
         fun changeSound(sound: Int, isPiano: Boolean) {
