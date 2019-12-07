@@ -5,7 +5,6 @@ import android.content.ComponentCallbacks2
 import android.content.Context
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
@@ -13,10 +12,11 @@ import android.graphics.Color
 import android.graphics.PorterDuff
 import android.media.Image
 import android.media.VolumeShaper
-import android.os.Handler
+import android.os.*
 import android.provider.MediaStore
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
 import java.lang.Exception
 
 
@@ -27,6 +27,7 @@ import java.lang.Exception
 // ToDo: Fix A#4 in Organ Mode
 // ToDo: Fix C5 in Piano Mode
 
+@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
     // lists that hold all of the keys
     private var whiteKeys = ArrayList<pianoKey>()
@@ -141,6 +142,7 @@ class MainActivity : AppCompatActivity() {
         ).toCollection(ArrayList())
     }
 
+    //Displays background of app
     private fun loadBackground() {
         val background = ImageView(this.applicationContext)
         background.setImageResource(R.drawable.speakerbar)
@@ -149,6 +151,7 @@ class MainActivity : AppCompatActivity() {
         myLayout.addView(background)
     }
 
+    //Opens Menu Bar for Alternate Modes
     private fun openMenu(c: ImageView, m: ImageView, e: ImageView, o: ImageView, p: ImageView) {
         c.visibility = View.GONE
         m.visibility = View.VISIBLE
@@ -157,6 +160,7 @@ class MainActivity : AppCompatActivity() {
         p.visibility = View.VISIBLE
     }
 
+    //Closes Menu Bar
     private fun closeMenu(c: ImageView, m: ImageView, e: ImageView, o: ImageView, p: ImageView) {
         m.visibility = View.GONE
         e.visibility = View.GONE
@@ -165,7 +169,7 @@ class MainActivity : AppCompatActivity() {
         c.visibility = View.VISIBLE
     }
 
-    // Don't fuck with this code. It took waaay too long to make work
+    // Don't mess with this code. It took way too long to make work
     // I'll go back and clean it up later
     // - Matt
     @SuppressLint("ClickableViewAccessibility")
@@ -349,25 +353,64 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    //queues piano sounds
     private fun convertToPianoSounds() {
         pianoSelected = true
         for(i in 0 until(whiteKeys.count()-1)) {
             whiteKeys[i].changeSound(whitePianoNotes[i], pianoSelected)
+            //vibrates when keyboard is pressed
+            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            if (vibrator.hasVibrator()) { // Vibrator availability checking
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)) // New vibrate method for API Level 26 or higher
+                } else {
+                    vibrator.vibrate(500) 
+                }
+            }
         }
 
         for(i in 0 until (blackKeys.count()-1)) {
             blackKeys[i].changeSound(blackPianoNotes[i], pianoSelected)
+            //vibrates when keyboard is pressed
+            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            if (vibrator.hasVibrator()) { // Vibrator availability checking
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)) // New vibrate method for API Level 26 or higher
+                } else {
+                    vibrator.vibrate(500)
+                }
+            }
         }
     }
 
+    //queues organ sounds
     private fun convertToOrganSounds() {
         pianoSelected = false
         for(i in 0 until whiteKeys.count()) {
             whiteKeys[i].changeSound(whiteOrganNotes[i], pianoSelected)
+            //vibrates when keyboard is pressed
+            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            if (vibrator.hasVibrator()) { // Vibrator availability checking
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)) // New vibrate method for API Level 26 or higher
+                } else {
+                    vibrator.vibrate(500)
+                }
+            }
         }
 
         for(i in 0 until (blackKeys.count()-1)) {
             blackKeys[i].changeSound(blackOrganNotes[i], pianoSelected)
+            //vibrates when keyboard is pressed
+            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            if (vibrator.hasVibrator()) { // Vibrator availability checking
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)) // New vibrate method for API Level 26 or higher
+                } else {
+                    vibrator.vibrate(500)
+                }
+            }
         }
     }
 
