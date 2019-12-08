@@ -3,7 +3,6 @@
 package com.example.ivories
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MotionEvent
@@ -13,25 +12,15 @@ import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.*
 import android.widget.ImageView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat.getSystemService
+import layout.PianoKey
 
-
-// ToDo: Fix the clipping at the end of notes
-// ToDo: Fix the bottom note being too low
-// ToDo: fix the organ audio being too low
-// ToDo: Fix the organ clipping when looping
-// ToDo: Fix A#4 in Organ Mode
-// ToDo: Fix C5 in Piano Mode
-
-@Suppress("DEPRECATION")
+// Main activity for the app
 class MainActivity : AppCompatActivity() {
     // lists that hold all of the keys
     private var whiteKeys = ArrayList<PianoKey>()
     private var blackKeys = ArrayList<PianoKey>()
 
     // Audio for the keys
-    // ToDo: Still have to remake C3
     private var whitePianoNotes = ArrayList<Int>()
     private var whiteOrganNotes = ArrayList<Int>()
     private var blackPianoNotes = ArrayList<Int>()
@@ -80,7 +69,6 @@ class MainActivity : AppCompatActivity() {
             // C# and D#
             for (k in 0..1) {
                 blackKeys.add(PianoKey(this.applicationContext, myLayout, 0F+(keyShiftRight*i++)+initialBlackOffset, screenHeight, blackPianoNotes[sound++], R.drawable.blackkey))
-
             }
 
             // break between || and |||
@@ -89,7 +77,6 @@ class MainActivity : AppCompatActivity() {
             // F#, G#, and A#
             for (k in 0..2) {
                 blackKeys.add(PianoKey(this.applicationContext, myLayout, 0F+(keyShiftRight*i++)+initialBlackOffset, screenHeight, blackPianoNotes[sound++], R.drawable.blackkey))
-
             }
 
             // Break between ||| and ||
@@ -107,35 +94,28 @@ class MainActivity : AppCompatActivity() {
     // Loads the white notes
     private fun loadWhiteNotes() {
         whitePianoNotes = intArrayOf(
-
-            // ToDo: add back c3
             R.raw.piano_c3, R.raw.piano_d3, R.raw.piano_e3, R.raw.piano_f3, R.raw.piano_g3, R.raw.piano_a3, R.raw.piano_b3,
             R.raw.piano_c4, R.raw.piano_d4, R.raw.piano_e4, R.raw.piano_f4, R.raw.piano_g4, R.raw.piano_a4, R.raw.piano_b4,
             R.raw.piano_c5
-
         ).toCollection(ArrayList())
-        whiteOrganNotes = intArrayOf(
 
+        whiteOrganNotes = intArrayOf(
             R.raw.organ_c3, R.raw.organ_d3, R.raw.organ_e3, R.raw.organ_f3, R.raw.organ_g3, R.raw.organ_a3, R.raw.organ_b3,
             R.raw.organ_c4, R.raw.organ_d4, R.raw.organ_e4, R.raw.organ_f4, R.raw.organ_g4, R.raw.organ_a4, R.raw.organ_b4,
             R.raw.organ_c5
-
         ).toCollection(ArrayList())
     }
 
     // Loads the black notes
     private fun loadBlackNotes() {
         blackPianoNotes = intArrayOf(
-
             R.raw.piano_cs3, R.raw.piano_ds3, R.raw.piano_fs3, R.raw.piano_gs3, R.raw.piano_as3,
             R.raw.piano_cs4, R.raw.piano_ds4, R.raw.piano_fs4, R.raw.piano_gs4, R.raw.piano_as4
-
         ).toCollection(ArrayList())
-        blackOrganNotes = intArrayOf(
 
+        blackOrganNotes = intArrayOf(
             R.raw.organ_cs3, R.raw.organ_ds3, R.raw.organ_fs3, R.raw.organ_gs3, R.raw.organ_as3,
             R.raw.organ_cs4, R.raw.organ_ds4, R.raw.organ_fs4, R.raw.organ_gs4, R.raw.organ_as4
-
         ).toCollection(ArrayList())
     }
 
@@ -234,8 +214,7 @@ class MainActivity : AppCompatActivity() {
 
         var organSound: MediaPlayer = MediaPlayer.create(this, R.raw.click_down) // Add audio here
 
-
-
+        // Crates listener for the Cog button
         cog.setOnTouchListener { _, event ->
             // If it's being pressed
             if (event.action == MotionEvent.ACTION_DOWN) {
@@ -295,22 +274,11 @@ class MainActivity : AppCompatActivity() {
             // If it's being pressed
             if (event.action == MotionEvent.ACTION_DOWN) {
 
-                // sound from here http://soundbible.com/1970-Pen-Clicks.html
                 // make the key darker
                 pianoButton.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP)
                 pianoSound.reset()
                 pianoSound = MediaPlayer.create(getBaseContext(), R.raw.click_down)
                 pianoSound.start()
-
-                // key vibrates as it is pressed
-                val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                if (vibrator.hasVibrator()) { // Vibrator availability checking
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)) // New vibrate method for API Level 26 or higher
-                    } else {
-                        vibrator.vibrate(500) // Vibrate method for below API Level 26
-                    }
-                }
 
                 // If it's released
             } else if (event.action == MotionEvent.ACTION_UP) {
@@ -335,7 +303,6 @@ class MainActivity : AppCompatActivity() {
             // If it's being pressed
             if (event.action == MotionEvent.ACTION_DOWN) {
 
-                // sound from here http://soundbible.com/1970-Pen-Clicks.html
                 // make the key darker
                 organButton.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP)
                 organSound.reset()
@@ -357,7 +324,6 @@ class MainActivity : AppCompatActivity() {
             true
         }
     }
-
 
     //switches sounds to piano
     private fun convertToPianoSounds() {
@@ -383,80 +349,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-   private class PianoKey(context: Context, myLayout: ConstraintLayout, _x: Float, _y: Float, sound: Int, image: Int) {
-        var keySound = MediaPlayer()
-        var newView = ImageView(context)
-        var parentContext = context
-        val keyShiftUp = 480F
-
-        init {
-            // Set the skin
-            newView.setImageResource(image)
-
-            // Set the x and y coordinates
-            newView.x = _x
-            newView.y = _y - keyShiftUp
-
-            // Set the background color
-            newView.setBackgroundColor(Color.TRANSPARENT)
-
-            // Assign audio to the key
-            addAudioToKey(sound)
-
-            // Add to the layout
-            myLayout.addView(newView)
-        }
-
-        // Add audio to a single key
-        @SuppressLint("ClickableViewAccessibility")
-        fun addAudioToKey(sound: Int, pianoSelected: Boolean = true) {
-
-            if(!pianoSelected) {
-                keySound.isLooping = true
-            }
-
-            keySound.reset()
-            keySound = MediaPlayer.create(parentContext, sound)
-
-            // Create an on-touch listener
-            newView.setOnTouchListener { _, event ->
-
-                // If it's being pressed
-                if (event.action == MotionEvent.ACTION_DOWN) {
-
-                    // Start the audio
-                    keySound.start()
-                    //println("Test1: " + volumeOut.volume)
-
-                    // make the key darker
-                    newView.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP)
-
-                    // If it's released
-                } else if (event.action == MotionEvent.ACTION_UP) {
-                    // Clear the color
-                    newView.clearColorFilter()
-
-                    for(i in 1..10) {
-                        keySound.setVolume((1/(i*i)).toFloat(),(1/(i*i)).toFloat())
-                        Thread.sleep(2)
-                    }
-
-                    keySound.stop()
-
-                    // Reset the player
-                    keySound.prepare()
-                    keySound.setVolume((1).toFloat(),(1).toFloat())
-
-                }
-
-                true
-            }
-        }
-
-        fun changeSound(sound: Int, isPiano: Boolean) {
-            keySound.release()
-            keySound = MediaPlayer.create(parentContext, sound)
-            keySound.isLooping = !isPiano
-        }
-    }
 }
