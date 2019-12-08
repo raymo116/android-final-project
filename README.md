@@ -7,7 +7,7 @@
 > __*Course Number and Section: CPSC 356-01*__
 
 ## Resources
-* 
+* https://stackoverflow.com/questions/47880450/how-to-vibrate-device-on-button-click-using-vibrator-effects-using-kotlin
 
 ## Programming Instructions
 * Go to Android Studio
@@ -15,4 +15,4 @@
 * Build and run
 
 ## Presentation Link
-* https://docs.google.com/presentation/d/1MlSqUnrJE9MnG4a4nJeXwlxJaNHVWNL6AOwYwASBhBA/edit?usp=sharing
+* 
