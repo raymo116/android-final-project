@@ -1,7 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.ivories
 
 import android.annotation.SuppressLint
-import android.content.ComponentCallbacks2
 import android.content.Context
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
@@ -10,14 +11,10 @@ import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
 import android.graphics.Color
 import android.graphics.PorterDuff
-import android.media.Image
-import android.media.VolumeShaper
 import android.os.*
-import android.provider.MediaStore
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.fragment.app.Fragment
-import java.lang.Exception
+import androidx.core.content.ContextCompat.getSystemService
 
 
 // ToDo: Fix the clipping at the end of notes
@@ -30,8 +27,8 @@ import java.lang.Exception
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
     // lists that hold all of the keys
-    private var whiteKeys = ArrayList<pianoKey>()
-    private var blackKeys = ArrayList<pianoKey>()
+    private var whiteKeys = ArrayList<PianoKey>()
+    private var blackKeys = ArrayList<PianoKey>()
 
     // Audio for the keys
     // ToDo: Still have to remake C3
@@ -60,15 +57,15 @@ class MainActivity : AppCompatActivity() {
 
         loadBackground()
         createMenu()
-
     }
+
 
     // Create all of the white keys
     private fun createWhiteKeys() {
         // creates 14 white keys
         for (i in 0..14) {
             //whiteKeys.add(createWhiteKey(0F+(keyShiftRight*i), screenHeight, i))
-            whiteKeys.add(pianoKey(this.applicationContext, myLayout, 0F+(keyShiftRight*i), screenHeight, whitePianoNotes[i], R.drawable.whitekey))
+            whiteKeys.add(PianoKey(this.applicationContext, myLayout, 0F+(keyShiftRight*i), screenHeight, whitePianoNotes[i], R.drawable.whitekey))
         }
     }
 
@@ -82,7 +79,7 @@ class MainActivity : AppCompatActivity() {
         for(p in 0..1) {
             // C# and D#
             for (k in 0..1) {
-                blackKeys.add(pianoKey(this.applicationContext, myLayout, 0F+(keyShiftRight*i++)+initialBlackOffset, screenHeight, blackPianoNotes[sound++], R.drawable.blackkey))
+                blackKeys.add(PianoKey(this.applicationContext, myLayout, 0F+(keyShiftRight*i++)+initialBlackOffset, screenHeight, blackPianoNotes[sound++], R.drawable.blackkey))
 
             }
 
@@ -91,7 +88,7 @@ class MainActivity : AppCompatActivity() {
 
             // F#, G#, and A#
             for (k in 0..2) {
-                blackKeys.add(pianoKey(this.applicationContext, myLayout, 0F+(keyShiftRight*i++)+initialBlackOffset, screenHeight, blackPianoNotes[sound++], R.drawable.blackkey))
+                blackKeys.add(PianoKey(this.applicationContext, myLayout, 0F+(keyShiftRight*i++)+initialBlackOffset, screenHeight, blackPianoNotes[sound++], R.drawable.blackkey))
 
             }
 
@@ -174,7 +171,6 @@ class MainActivity : AppCompatActivity() {
     // - Matt
     @SuppressLint("ClickableViewAccessibility")
     private fun createMenu() {
-
         // Create Options icon
         // Creates a new image
         var cog = ImageView(this)
@@ -241,7 +237,6 @@ class MainActivity : AppCompatActivity() {
 
 
         cog.setOnTouchListener { _, event ->
-
             // If it's being pressed
             if (event.action == MotionEvent.ACTION_DOWN) {
 
@@ -307,6 +302,16 @@ class MainActivity : AppCompatActivity() {
                 pianoSound = MediaPlayer.create(getBaseContext(), R.raw.click_down)
                 pianoSound.start()
 
+                // key vibrates as it is pressed
+                val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                if (vibrator.hasVibrator()) { // Vibrator availability checking
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)) // New vibrate method for API Level 26 or higher
+                    } else {
+                        vibrator.vibrate(500) // Vibrate method for below API Level 26
+                    }
+                }
+
                 // If it's released
             } else if (event.action == MotionEvent.ACTION_UP) {
                 // Clear the color
@@ -354,75 +359,37 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    //queues piano sounds
+    //switches sounds to piano
     private fun convertToPianoSounds() {
         pianoSelected = true
         for(i in 0 until(whiteKeys.count())) {
             whiteKeys[i].changeSound(whitePianoNotes[i], pianoSelected)
-            //vibrates when keyboard is pressed
-            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            if (vibrator.hasVibrator()) { // Vibrator availability checking
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)) // New vibrate method for API Level 26 or higher
-                } else {
-                    vibrator.vibrate(500) 
-                }
-            }
         }
 
         for(i in 0 until (blackKeys.count())) {
             blackKeys[i].changeSound(blackPianoNotes[i], pianoSelected)
-            //vibrates when keyboard is pressed
-            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            if (vibrator.hasVibrator()) { // Vibrator availability checking
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)) // New vibrate method for API Level 26 or higher
-                } else {
-                    vibrator.vibrate(500)
-                }
-            }
         }
     }
 
-    //queues organ sounds
+    //switches sounds to organ
     private fun convertToOrganSounds() {
         pianoSelected = false
         for(i in 0 until whiteKeys.count()) {
             whiteKeys[i].changeSound(whiteOrganNotes[i], pianoSelected)
-            //vibrates when keyboard is pressed
-            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            if (vibrator.hasVibrator()) { // Vibrator availability checking
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)) // New vibrate method for API Level 26 or higher
-                } else {
-                    vibrator.vibrate(500)
-                }
-            }
         }
 
         for(i in 0 until (blackKeys.count())) {
             blackKeys[i].changeSound(blackOrganNotes[i], pianoSelected)
-            //vibrates when keyboard is pressed
-            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            if (vibrator.hasVibrator()) { // Vibrator availability checking
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)) // New vibrate method for API Level 26 or higher
-                } else {
-                    vibrator.vibrate(500)
-                }
-            }
         }
     }
 
-    private class pianoKey(context: Context, myLayout: ConstraintLayout, _x: Float, _y: Float, sound: Int, image: Int) {
+   private class PianoKey(context: Context, myLayout: ConstraintLayout, _x: Float, _y: Float, sound: Int, image: Int) {
         var keySound = MediaPlayer()
         var newView = ImageView(context)
         var parentContext = context
         val keyShiftUp = 480F
 
-
         init {
-
             // Set the skin
             newView.setImageResource(image)
 
@@ -442,11 +409,7 @@ class MainActivity : AppCompatActivity() {
 
         // Add audio to a single key
         @SuppressLint("ClickableViewAccessibility")
-        private fun addAudioToKey(sound: Int, pianoSelected: Boolean = true) {
-
-            val times = floatArrayOf(0f, 1f) // can add more points, volume points must correspond to time points
-            val volumes = floatArrayOf(1f, 0f)
-
+        fun addAudioToKey(sound: Int, pianoSelected: Boolean = true) {
 
             if(!pianoSelected) {
                 keySound.isLooping = true
