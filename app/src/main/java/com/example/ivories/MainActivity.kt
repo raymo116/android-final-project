@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity() {
         whitePianoNotes = intArrayOf(
 
             // ToDo: add back c3
-            R.raw.piano_c4, R.raw.piano_d3, R.raw.piano_e3, R.raw.piano_f3, R.raw.piano_g3, R.raw.piano_a3, R.raw.piano_b3,
+            R.raw.piano_c3, R.raw.piano_d3, R.raw.piano_e3, R.raw.piano_f3, R.raw.piano_g3, R.raw.piano_a3, R.raw.piano_b3,
             R.raw.piano_c4, R.raw.piano_d4, R.raw.piano_e4, R.raw.piano_f4, R.raw.piano_g4, R.raw.piano_a4, R.raw.piano_b4,
             R.raw.piano_c5
 
@@ -357,7 +357,7 @@ class MainActivity : AppCompatActivity() {
     //queues piano sounds
     private fun convertToPianoSounds() {
         pianoSelected = true
-        for(i in 0 until(whiteKeys.count()-1)) {
+        for(i in 0 until(whiteKeys.count())) {
             whiteKeys[i].changeSound(whitePianoNotes[i], pianoSelected)
             //vibrates when keyboard is pressed
             val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -370,7 +370,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        for(i in 0 until (blackKeys.count()-1)) {
+        for(i in 0 until (blackKeys.count())) {
             blackKeys[i].changeSound(blackPianoNotes[i], pianoSelected)
             //vibrates when keyboard is pressed
             val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -400,7 +400,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        for(i in 0 until (blackKeys.count()-1)) {
+        for(i in 0 until (blackKeys.count())) {
             blackKeys[i].changeSound(blackOrganNotes[i], pianoSelected)
             //vibrates when keyboard is pressed
             val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
