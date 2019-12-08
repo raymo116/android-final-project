@@ -9,6 +9,7 @@
 ## Resources
 * https://stackoverflow.com/questions/47880450/how-to-vibrate-device-on-button-click-using-vibrator-effects-using-kotlin
 * https://stackoverflow.com/questions/38691131/android-kotlin-java-lang-noclassdeffounderror-failed-resolution-of-kotlinob
+* http://soundbible.com/1970-Pen-Clicks.html
 
 ## Programming Instructions
 * Go to Android Studio
