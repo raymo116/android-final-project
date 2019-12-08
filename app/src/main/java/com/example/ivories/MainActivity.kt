@@ -4,7 +4,6 @@ import android.content.ComponentCallbacks2
 import android.content.Context
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
@@ -12,7 +11,7 @@ import android.graphics.Color
 import android.graphics.PorterDuff
 import android.media.Image
 import android.media.VolumeShaper
-import android.os.Handler
+import android.os.*
 import android.provider.MediaStore
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -499,11 +498,14 @@ class MainActivity : AppCompatActivity() {
         // Add audio to a single key
         fun addAudioToKey(sound: Int, pianoSelected: Boolean = true) {
 
-            val times = floatArrayOf(0f, 1f) // can add more points, volume points must correspond to time points
+            val times = floatArrayOf(
+                0f,
+                1f
+            ) // can add more points, volume points must correspond to time points
             val volumes = floatArrayOf(1f, 0f)
 
 
-            if(!pianoSelected) {
+            if (!pianoSelected) {
                 keySound.isLooping = true
             }
 
@@ -522,14 +524,15 @@ class MainActivity : AppCompatActivity() {
 
                     // make the key darker
                     newView.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP)
+                    vibratePhone(50)
 
                     // If it's released
                 } else if (event.action == MotionEvent.ACTION_UP) {
                     // Clear the color
                     newView.clearColorFilter()
 
-                    for(i in 1..10) {
-                        keySound.setVolume((1/(i*i)).toFloat(),(1/(i*i)).toFloat())
+                    for (i in 1..10) {
+                        keySound.setVolume((1 / (i * i)).toFloat(), (1 / (i * i)).toFloat())
                         Thread.sleep(2)
                     }
 
@@ -537,7 +540,7 @@ class MainActivity : AppCompatActivity() {
 
                     // Reset the player
                     keySound.prepare()
-                    keySound.setVolume((1).toFloat(),(1).toFloat())
+                    keySound.setVolume((1).toFloat(), (1).toFloat())
 
                 }
 
@@ -549,6 +552,15 @@ class MainActivity : AppCompatActivity() {
             keySound.release()
             keySound = MediaPlayer.create(parentContext, sound)
             keySound.isLooping = !isPiano
+        }
+
+        fun vibratePhone(time:Long) {
+            val vibrator = parentContext?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            if (Build.VERSION.SDK_INT >= 26) {
+                vibrator.vibrate(VibrationEffect.createOneShot(time, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                vibrator.vibrate(time)
+            }
         }
     }
 }
